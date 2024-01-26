@@ -1,14 +1,8 @@
 import json
-import pytest
-from uuid import uuid4
 
 
 async def test_create_user(client, get_user_from_database):
-    user_data = {
-      "name": "Nikolai",
-      "surname": "Sviridov",
-      "email": "lol@kek.com"
-    }
+    user_data = {"name": "Nikolai", "surname": "Sviridov", "email": "lol@kek.com"}
     resp = client.post("/user/", data=json.dumps(user_data))
     data_from_resp = resp.json()
     assert resp.status_code == 200

@@ -1,18 +1,24 @@
 import asyncio
-import asyncpg
 import os
+from typing import Any
+from typing import Generator
+
+import asyncpg
 import pytest
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import sessionmaker
+from starlette.testclient import TestClient
+
 import settings
 from db.session import get_db
 from main import app
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
-from starlette.testclient import TestClient
-from typing import Any, Generator
 
 test_engine = create_async_engine(settings.TEST_DATABASE_URL, future=True, echo=True)
 
-test_async_session = sessionmaker(test_engine, expire_on_commit=False, class_=AsyncSession)
+test_async_session = sessionmaker(
+    test_engine, expire_on_commit=False, class_=AsyncSession
+)
 
 CLEAN_TABLES = [
     "users",
@@ -63,7 +69,9 @@ async def client() -> Generator[TestClient, Any, None]:
 
 @pytest.fixture(scope="session")
 async def asyncpg_pool():
-    pool = await asyncpg.create_pool("".join(settings.TEST_DATABASE_URL.split("+asyncpg")))
+    pool = await asyncpg.create_pool(
+        "".join(settings.TEST_DATABASE_URL.split("+asyncpg"))
+    )
     yield pool
     pool.close()
 
@@ -72,6 +80,8 @@ async def asyncpg_pool():
 async def get_user_from_database(asyncpg_pool):
     async def get_user_from_database_by_uuid(user_id: str):
         async with asyncpg_pool.acquire() as connection:
-            return await connection.fetch("""SELECT * FROM users WHERE user_id = $1;""", user_id)
+            return await connection.fetch(
+                """SELECT * FROM users WHERE user_id = $1;""", user_id
+            )
 
     return get_user_from_database_by_uuid

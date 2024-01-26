@@ -1,7 +1,8 @@
 import uvicorn
-from api.handlers import user_router
 from fastapi import FastAPI
 from fastapi.routing import APIRouter
+
+from api.handlers import user_router
 
 
 app = FastAPI(title="university")
